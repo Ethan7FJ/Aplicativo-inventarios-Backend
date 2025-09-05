@@ -1,0 +1,40 @@
+/* // src/server.ts
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+
+const app = express();
+app.use(cors());
+
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000", // URL de tu frontend React
+    methods: ["GET", "POST"]
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("🔌 Usuario conectado:", socket.id);
+
+  socket.on("chatMessage", (msg) => {
+    const messageData = {
+      id: socket.id,
+      text: msg,
+    };
+
+    io.emit("chatMessage", messageData);
+  });
+
+
+  socket.on("disconnect", () => {
+    console.log("❌ Usuario desconectado:", socket.id);
+  });
+});
+
+
+httpServer.listen(4000, () => {
+  console.log("🚀 Servidor corriendo en http://localhost:4000");
+});
+ */
