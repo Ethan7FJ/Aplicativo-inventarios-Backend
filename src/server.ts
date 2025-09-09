@@ -19,11 +19,11 @@ const SECRET = process.env.JWT_SECRET as string;
 /* Peticion de registro */
 
 app.post("/registro", async (req, res) => {
-  const { username, password } = req.body;
+  const { nombre_usuario, apellido_usuario, email_usuario, password } = req.body;
 
   try {
     // Verificar si ya existe
-    const [rows]: any = await db.query("SELECT * FROM users WHERE username = ?", [username]);
+    const [rows]: any = await db.query("SELECT * FROM users WHERE nombre_usuario = ? AND apellido_usuario = ? AND email_usuario = ?", [nombre_usuario,apellido_usuario,email_usuario]);
     if (rows.length > 0) {
       return res.status(400).json({ error: "El usuario ya está registrado" });
     }
@@ -32,12 +32,14 @@ app.post("/registro", async (req, res) => {
     const passwordCript = await bcrypt.hash(password, 10);
 
     // Insertar en DB
-    await db.query("INSERT INTO users (username, password) VALUES (?, ?)", [
-      username,
+    await db.query("INSERT INTO users (nombre_usuario,apellido_usuario,email_usuario,password) VALUES (?, ?, ?, ?)", [
+      nombre_usuario,
+      apellido_usuario,
+      email_usuario,
       passwordCript,
     ]);
 
-    res.json({ success: true, user: { username } });
+    res.json({ success: true, user: {nombre_usuario} });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error en el servidor" });
@@ -45,11 +47,11 @@ app.post("/registro", async (req, res) => {
 });
 
 app.post("/inicio-sesion", async (req, res) => {
-  const { username, password } = req.body;
+  const { email_usuario, password } = req.body;
 
   try{
     const [rows]: any = await db.query(
-      "SELECT * FROM users WHERE username = ?",[username]
+      "SELECT * FROM users WHERE email_usuario = ?",[email_usuario]
     );
     if(rows.length === 0){
       return res.status(401).json({error: "El usuario no ha sido encontrado o no se encuentra registrado"})
@@ -63,7 +65,7 @@ app.post("/inicio-sesion", async (req, res) => {
     }
 
     const token = jwt.sign(
-      {id: user.id, username:user.username},
+      {id: user.id, nombre_usuario:user.nombre_usuario, apellido_usuario:user.apellido_usuario, email:user.email_usuario, rol:user.rol},
       SECRET,
       {expiresIn: "1h"}
     )
