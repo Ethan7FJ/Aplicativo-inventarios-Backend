@@ -134,6 +134,34 @@ app.post("/registro-productos", async (req, res) => {
 });
 
 
+app.get("/productos", async (req, res) => {
+  try {
+    const [productos] = await db.query("SELECT a.*, c.categora, p.nombre, u.nombre_usuario, u.apellido_usuario FROM producto AS a JOIN categorias AS c ON a.categoria_id = c.id JOIN proveedores AS p ON a.id_provedor = p.id_proveedor JOIN users AS u ON a.id_user = u.id");
+
+    res.json({ success: true, productos: productos })
+  } catch (err) {
+    console.log("Error traer las categorias", err);
+    res.status(500).json({ error: "Error en el servidor" })
+  }
+});
+
+app.delete("/borrar/producto/:id", async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    await db.query("DELETE FROM producto WHERE id = ?", [id]);
+
+    res.json({ success: true, mensaje: "Producto eliminado correctamente" })
+
+  } catch (err) {
+    console.log("Error al eliminar el producto", err);
+    res.status(500).json({ error: "Error en el servidor" })
+  }
+})
+
+
+
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
