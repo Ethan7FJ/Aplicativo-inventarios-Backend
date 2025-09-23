@@ -160,6 +160,34 @@ app.delete("/borrar/producto/:id", async (req, res) => {
   }
 })
 
+app.put("/editar/producto/:id", async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { serial_producto, nombre_producto, descripcion_producto, cantidad_producto, id_categoria, stock, costo_unitario, precio_venta, id_proveedor} = req.body;
+
+
+    await db.query("UPDATE producto set serial_producto = ?, nombre_producto = ?, descripcion_producto = ?, cantidad_producto = ?, categoria_id = ?, stock = ?, costo_unitario = ?, precio_venta = ?, id_provedor = ? WHERE id = ?;", [
+      serial_producto || null,
+      nombre_producto || null,
+      descripcion_producto || null,
+      cantidad_producto || null,
+      id_categoria || null,
+      stock || null,
+      costo_unitario || null,
+      precio_venta || null,
+      id_proveedor || null,
+      id,
+    ]);
+
+    res.json({ success: true, alerta: "Producto editado correctamente" })
+
+  } catch (err) {
+    console.log("Error al editar el producto", err);
+    res.status(500).json({ error: "Error en el servidor" })
+  }
+})
+
 
 
 
